@@ -10,7 +10,9 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install system dependencies for building Python packages
-RUN apt-get update && apt-get install -y curl build-essential && apt-get clean
+#RUN apt-get update && apt-get install -y curl build-essential && apt-get clean
+RUN apt-get update && apt-get install -y curl build-essential libpq-dev && apt-get clean
+
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
