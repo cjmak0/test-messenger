@@ -19,7 +19,7 @@ jobs:
       - name: Build Docker image
         run: |
           IMAGE_TAG=test-messenger:${{ github.sha }}
-          docker build -t $IMAGE_TAG -f test-messenger/Dockerfile test-messenger/
+          docker build -t $IMAGE_TAG -f Dockerfile .
 
       - name: Tag and push image
         run: |
