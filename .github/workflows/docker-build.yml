@@ -19,11 +19,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_TAG=test-messenger:${{ github.sha }}
-          docker build -t $IMAGE_TAG -f Dockerfile .
+          IMAGE_NAME=test-messenger
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
 
       - name: Tag and push image
         run: |
-          IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/test-messenger
-          docker tag test-messenger:${{ github.sha }} $IMAGE_REPO:${{ github.sha }}
-          docker push $IMAGE_REPO:${{ github.sha }}
+          IMAGE_NAME=test-messenger
+          IMAGE_TAG=${{ github.sha }}
+          IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
+
+          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_REPO:$IMAGE_TAG
+          docker push $IMAGE_REPO:$IMAGE_TAG
