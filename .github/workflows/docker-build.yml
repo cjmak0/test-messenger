@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: self-hosted  # or 'ubuntu-latest' if Docker is available there
+    runs-on: ubuntu-latest  # Use GitHub-hosted runner with Docker preinstalled
 
     steps:
       - name: Checkout code
