@@ -1,0 +1,28 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - master  # Triggered on PR merge to main
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted  # or 'ubuntu-latest' if Docker is available there
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PWD }}" | docker login -u "${{ secrets.DOCKER_UID }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG=test-messenger:${{ github.sha }}
+          docker build -t $IMAGE_TAG -f test-messenger/Dockerfile test-messenger/
+
+      - name: Tag and push image
+        run: |
+          IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/test-messenger
+          docker tag test-messenger:${{ github.sha }} $IMAGE_REPO:${{ github.sha }}
+          docker push $IMAGE_REPO:${{ github.sha }}
