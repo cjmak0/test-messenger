@@ -17,14 +17,14 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
 # Copy Poetry config first to install dependencies (cached layer)
-COPY test-messenger/pyproject.toml test-messenger/poetry.lock* /app/
+COPY pyproject.toml poetry.lock* /app/
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
  && poetry install --no-interaction --no-ansi
 
 # Copy the rest of the app code
-COPY test-messenger/ /app/
+COPY . /app/
 
 # Expose the app port
 EXPOSE 8000

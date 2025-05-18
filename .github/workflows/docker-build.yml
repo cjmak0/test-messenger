@@ -7,6 +7,7 @@ on:
 
 jobs:
   build-and-push:
+    name: Build and Push to Docker Hub
     runs-on: ubuntu-latest  # Use GitHub-hosted runner with Docker preinstalled
 
     steps:
