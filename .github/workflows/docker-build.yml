@@ -35,17 +35,10 @@ jobs:
       - name: Get Digest from Docker Hub
         id: digest
         run: |
-          IMAGE_NAME=test-messenger
+          IMAGE_REPO=cjmak0/test-messenger
           IMAGE_TAG=${{ github.sha }}
-          IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          USER_NAME=${IMAGE_REPO%%/*}
-          REPO_NAME=${IMAGE_REPO##*/}
-
-          DIGEST=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-            "https://index.docker.io/v2/${USER_NAME}/${REPO_NAME}/manifests/${IMAGE_TAG}" \
-            | jq -r .config.digest)
-
+          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
           echo "digest=$DIGEST"
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
