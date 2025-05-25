@@ -35,11 +35,9 @@ jobs:
       - name: Get Digest from Docker Hub
         id: digest
         run: |
-          IMAGE_REPO=cjmak0/test-messenger
+          IMAGE_NAME=test-messenger
           IMAGE_TAG=${{ github.sha }}
-
-          USER_NAME=${IMAGE_REPO%%/*}
-          REPO_NAME=${IMAGE_REPO##*/}
+          IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
           docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}'
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
