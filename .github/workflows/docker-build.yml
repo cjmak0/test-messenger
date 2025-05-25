@@ -42,17 +42,6 @@ jobs:
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
-
-      #- name: Install Cosign
-      #  uses: sigstore/cosign-installer@v3.1.1
-
-      #- name: Sign Docker image
-      #  env:
-      #    COSIGN_EXPERIMENTAL: "true"
-      #  run: |
-      #    cosign sign --yes -a commit="${{ github.sha }}" \
-      #      docker.io/youruser/app:latest
-
       - name: Clone deploy repo and update staging values
         run: |
           git config --global user.name "GitOps Bot"
