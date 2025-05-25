@@ -32,15 +32,22 @@ jobs:
           docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_REPO:$IMAGE_TAG
           docker push $IMAGE_REPO:$IMAGE_TAG
 
-      - name: Get image digest
+      - name: Get Digest from Docker Hub
         id: digest
         run: |
           IMAGE_NAME=test-messenger
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          USER_NAME=${IMAGE_REPO%%/*}
+          REPO_NAME=${IMAGE_REPO##*/}
+
+          DIGEST=$(curl -s -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            "https://index.docker.io/v2/${USER_NAME}/${REPO_NAME}/manifests/${IMAGE_TAG}" \
+            | jq -r .config.digest)
+
+          echo "digest=$DIGEST"
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
       - name: Clone deploy repo and update staging values
         run: |
@@ -51,8 +58,8 @@ jobs:
           cd test-messenger-deploy
           git checkout -b update-staging-${{ github.sha }} origin/staging
 
-          yq e '.image.digest = "${{ steps.digest.outputs.digest }}"' -i envs/staging/values.yaml
-          
+          yq e '.image = {"repository": "cjmak0/test-messenger", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
+
           git add envs/staging/values.yaml
           git commit -m "Update image digest to ${{ steps.digest.outputs.digest }}"
           git push origin HEAD
@@ -67,7 +74,7 @@ jobs:
           title: "Update image digest to ${{ steps.digest.outputs.digest }}"
           commit-message: "Update image digest to ${{ steps.digest.outputs.digest }}"
           body: |
-            This PR updates the Helm staging deployment with the new image:
+            This PR updates the Helm deployment to use image:
             `cjmak0/test-messenger@${{ steps.digest.outputs.digest }}`
 
 
