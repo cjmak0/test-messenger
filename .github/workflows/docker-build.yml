@@ -48,7 +48,7 @@ jobs:
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
           echo "Digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
+      
       - name: Use Digest
         run: echo "Image Digest is ${{ steps.digest.outputs.digest }}"
 
