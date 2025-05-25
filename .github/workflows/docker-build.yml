@@ -48,11 +48,9 @@ jobs:
           git config --global user.email "bot@example.com"
 
           git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/cjmak0/test-messenger-deploy.git
-							
           cd test-messenger-deploy
           git checkout -b update-staging-${{ github.sha }} origin/staging
 
-          # Update image digest using yq
           yq e '.image.digest = "${{ steps.digest.outputs.digest }}"' -i envs/staging/values.yaml
           
           git add envs/staging/values.yaml
