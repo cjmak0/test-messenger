@@ -35,15 +35,19 @@ jobs:
       - name: Get Digest from Docker Hub
         id: digest
         run: |
+          set -e
+
           IMAGE_NAME=test-messenger
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}'
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
 
-          echo "digest=$DIGEST"
-          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+          echo "Digest: $DIGEST"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Use Digest
+        run: echo "Image Digest is ${{ steps.digest.outputs.digest }}"
 
       - name: Clone deploy repo and update staging values
         run: |
