@@ -54,11 +54,11 @@ jobs:
           git config --global user.name "GitOps Bot"
           git config --global user.email "bot@example.com"
 
-          git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/youruser/app-deploy.git
-          cd app-deploy
+          git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/cjmak0/test-messenger-deploy.git
+          cd test-messenger-deploy
           git checkout -b update-staging-${{ github.sha }} origin/staging
 
-          yq e '.image = {"repository": "youruser/test-messenger", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
+          yq e '.image = {"repository": "cjmak0/test-messenger", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
 
           git add envs/staging/values.yaml
           git commit -m "Update image digest to ${{ steps.digest.outputs.digest }}"
@@ -68,13 +68,13 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_ACTIONS_PAT }}
-          repository: youruser/app-deploy
+          repository: cjmak0/test-messenger-deploy
           base: staging
           branch: update-staging-${{ github.sha }}
           title: "Update image digest to ${{ steps.digest.outputs.digest }}"
           commit-message: "Update image digest to ${{ steps.digest.outputs.digest }}"
           body: |
             This PR updates the Helm deployment to use image:
-            `youruser/test-messenger@${{ steps.digest.outputs.digest }}`
+            `cjmak0/test-messenger@${{ steps.digest.outputs.digest }}`
 
 
