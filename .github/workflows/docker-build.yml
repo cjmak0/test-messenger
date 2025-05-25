@@ -38,7 +38,12 @@ jobs:
           IMAGE_REPO=cjmak0/test-messenger
           IMAGE_TAG=${{ github.sha }}
 
+          USER_NAME=${IMAGE_REPO%%/*}
+          REPO_NAME=${IMAGE_REPO##*/}
+
+          docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}'
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
+
           echo "digest=$DIGEST"
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
