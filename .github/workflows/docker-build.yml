@@ -45,7 +45,7 @@ jobs:
 
           echo "Digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
+      
       - name: Use Digest
         run: echo "Image Digest is ${{ steps.digest.outputs.digest }}"
 
