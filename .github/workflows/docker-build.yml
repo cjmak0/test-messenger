@@ -41,11 +41,7 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          DEGUB=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}')
-          echo "Digest: $DEGUB"
-          echo "debug=$DEGUB" >> "$GITHUB_OUTPUT"
-
-          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.Digest}}')
+          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{.manifest.Digest}}')
           echo "Digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
       
