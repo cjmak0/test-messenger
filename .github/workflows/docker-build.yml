@@ -79,7 +79,7 @@ jobs:
             --repo "$GITHUB_USER/$DEPLOY_REPO" \
             --base staging \
             --head update-staging-${{ github.sha }} \
-            --title "Update image digest to ${{ steps.digest.outputs.digest }}" \
+            --title "Update image digest for staging release" \
             --body "This PR updates the Helm deployment to use image:\n${GITHUB_USER}/${CODE_REPO}@${{ steps.digest.outputs.digest }}"
         env:
           GH_TOKEN: ${{ secrets.GH_ACTIONS_PAT }}
