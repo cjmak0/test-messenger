@@ -74,6 +74,7 @@ jobs:
 
       - name: Create PR to staging
         uses: peter-evans/create-pull-request@v5
+        working-directory: ./${{ env.DEPLOY_REPO }}
         with:
           token: ${{ secrets.GH_ACTIONS_PAT }}
           base: staging
@@ -83,4 +84,3 @@ jobs:
           body: |
             This PR updates the Helm deployment to use image:
             `${{ env.GITHUB_USER }}/${{ env.CODE_REPO }}@${{ steps.digest.outputs.digest }}`
-          working-directory: ./${{ env.DEPLOY_REPO }}
