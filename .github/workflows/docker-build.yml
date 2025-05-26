@@ -3,17 +3,17 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - master  # Triggered on PR merge to main
-  
+      - master  # Triggered on PR merge to master
+
 env:
-   GITHUB_USER : ${{ secrets.GH_USER }}
-   DEPLOY_REPO : ${{ secrets.DEPLOY_REPO }}
-   CODE_REPO : ${{ secrets.CODE_REPO }}
+  GITHUB_USER: ${{ secrets.GH_USER }}
+  DEPLOY_REPO: ${{ secrets.DEPLOY_REPO }}
+  CODE_REPO: ${{ secrets.CODE_REPO }}
 
 jobs:
   build-and-push:
     name: Build and Push to Docker Hub
-    runs-on: ubuntu-latest  # Use GitHub-hosted runner with Docker preinstalled
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -24,13 +24,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME=${{ CODE_REPO }}
+          IMAGE_NAME=$CODE_REPO
           IMAGE_TAG=${{ github.sha }}
           docker build -t $IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
 
       - name: Tag and push image
         run: |
-          IMAGE_NAME=${{ CODE_REPO }}
+          IMAGE_NAME=$CODE_REPO
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
@@ -42,19 +42,16 @@ jobs:
         run: |
           set -e
 
-          IMAGE_NAME=${{ CODE_REPO }}
+          IMAGE_NAME=$CODE_REPO
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          SomeDebug=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}')
-          echo "SomeDebug: $SomeDebug"
-          echo "----------------------"
-
+          echo "Inspecting image: $IMAGE_REPO:$IMAGE_TAG"
           DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}' | jq -r '.manifest.digest')
 
           echo "Digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-      
+
       - name: Use Digest
         run: echo "Image Digest is ${{ steps.digest.outputs.digest }}"
 
@@ -63,31 +60,27 @@ jobs:
           git config --global user.name "GitOps Bot"
           git config --global user.email "bot@example.com"
 
-          git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/${{ GITHUB_USER }}/${{ DEPLOY_REPO }}.git
-          cd ${{ DEPLOY_REPO }}
+          git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/${{ env.GITHUB_USER }}/${{ env.DEPLOY_REPO }}.git
+          cd ${{ env.DEPLOY_REPO }}
 
           git fetch origin staging
           git checkout -b update-staging-${{ github.sha }} origin/staging
 
-          yq e '.image = {"repository": "${{ GITHUB_USER }}/${{ CODE_REPO }}", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
+          yq e '.image = {"repository": "${{ env.GITHUB_USER }}/${{ env.CODE_REPO }}", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
 
           git add envs/staging/values.yaml
           git commit -m "Update image digest to ${{ steps.digest.outputs.digest }}"
           git push origin HEAD
 
-
       - name: Create PR to staging
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_ACTIONS_PAT }}
-          repository: ${{ GITHUB_USER }}/${{ DEPLOY_REPO }}
           base: staging
           branch: update-staging-${{ github.sha }}
           title: "Update image digest to ${{ steps.digest.outputs.digest }}"
           commit-message: "Update image digest to ${{ steps.digest.outputs.digest }}"
           body: |
             This PR updates the Helm deployment to use image:
-            `${{ GITHUB_USER }}/${{ CODE_REPO }}@${{ steps.digest.outputs.digest }}`
-          working-directory: ./${{ DEPLOY_REPO }}
-
-
+            `${{ env.GITHUB_USER }}/${{ env.CODE_REPO }}@${{ steps.digest.outputs.digest }}`
+          working-directory: ./${{ env.DEPLOY_REPO }}
