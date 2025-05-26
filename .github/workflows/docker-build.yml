@@ -41,7 +41,7 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
 
-          SomeDebug = $(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}')
+          SomeDebug=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}')
           echo "SomeDebug: $SomeDebug"
           echo "----------------------"
 
