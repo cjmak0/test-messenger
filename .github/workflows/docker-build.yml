@@ -72,15 +72,14 @@ jobs:
           git commit -m "Update image digest to ${{ steps.digest.outputs.digest }}"
           git push origin HEAD
 
-      - name: Create PR to staging
-        uses: peter-evans/create-pull-request@v5
-        working-directory: ./${{ env.DEPLOY_REPO }}
-        with:
-          token: ${{ secrets.GH_ACTIONS_PAT }}
-          base: staging
-          branch: update-staging-${{ github.sha }}
-          title: "Update image digest to ${{ steps.digest.outputs.digest }}"
-          commit-message: "Update image digest to ${{ steps.digest.outputs.digest }}"
-          body: |
-            This PR updates the Helm deployment to use image:
-            `${{ env.GITHUB_USER }}/${{ env.CODE_REPO }}@${{ steps.digest.outputs.digest }}`
+      - name: Create PR in deploy repo
+        run: |
+          cd $DEPLOY_REPO
+          gh pr create \
+            --repo $DEPLOY_REPO \
+            --base staging \
+            --head update-staging-${{ github.sha }} \
+            --title "Update image digest to ${{ steps.digest.outputs.digest }}" \
+            --body "This PR updates the Helm deployment to use image:\n${GITHUB_USER}/${CODE_REPO}@${{ steps.digest.outputs.digest }}"
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACTIONS_PAT }}
