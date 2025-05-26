@@ -60,6 +60,8 @@ jobs:
 
           git clone https://x-access-token:${{ secrets.GH_ACTIONS_PAT }}@github.com/cjmak0/test-messenger-deploy.git
           cd test-messenger-deploy
+
+          git fetch origin staging
           git checkout -b update-staging-${{ github.sha }} origin/staging
 
           yq e '.image = {"repository": "cjmak0/test-messenger", "digest": "${{ steps.digest.outputs.digest }}"}' -i envs/staging/values.yaml
@@ -67,6 +69,7 @@ jobs:
           git add envs/staging/values.yaml
           git commit -m "Update image digest to ${{ steps.digest.outputs.digest }}"
           git push origin HEAD
+
 
       - name: Create PR to staging
         uses: peter-evans/create-pull-request@v5
