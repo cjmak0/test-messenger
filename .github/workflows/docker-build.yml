@@ -45,7 +45,7 @@ jobs:
           echo "SomeDebug: $SomeDebug"
           echo "----------------------"
 
-          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}' | jq -r '.manifests[0].digest')
+          DIGEST=$(docker buildx imagetools inspect $IMAGE_REPO:$IMAGE_TAG --format '{{json .}}' | jq -r '.manifest.digest')
 
           echo "Digest: $DIGEST"
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
